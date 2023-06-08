@@ -7,7 +7,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_User}:${process.env.DB_pass}@cluster0.cazjtjr.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -36,6 +36,24 @@ async function run() {
       const resault = await classesCullectionDB.find().toArray();
       res.send(resault);
     });
+    app.get("/role/", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const projection = { projection: { rol: 1 } };
+      const resault = await usersCullectionDB.findOne(query, projection);
+      // console.log(resault, email);
+      res.send(resault);
+    });
+    app.patch("/makeinstructor/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const update = {
+        $set: data,
+      };
+      const query = { _id: new ObjectId(id) };
+      const resault = await usersCullectionDB.updateOne(query, update);
+      res.send(resault);
+    });
     app.get("/users", async (req, res) => {
       const resault = await usersCullectionDB.find().toArray();
       res.send(resault);
@@ -61,5 +79,5 @@ app.get("/", (req, res) => {
   res.send(`summer is running ....`);
 });
 app.listen(port, () => {
-  console.log(`boos is wtaching on port ${port}`);
+  console.log(`the server is running on port ${port}`);
 });
