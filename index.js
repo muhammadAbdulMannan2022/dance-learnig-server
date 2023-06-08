@@ -30,7 +30,12 @@ async function run() {
     );
     const database = client.db("assignment12");
     const usersCullectionDB = database.collection("users");
+    const classesCullectionDB = database.collection("classes");
     // routes
+    app.get("/classes", async (req, res) => {
+      const resault = await classesCullectionDB.find().toArray();
+      res.send(resault);
+    });
     app.post("/users", async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
