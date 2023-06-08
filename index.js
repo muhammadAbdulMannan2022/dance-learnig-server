@@ -36,6 +36,10 @@ async function run() {
       const resault = await classesCullectionDB.find().toArray();
       res.send(resault);
     });
+    app.get("/users", async (req, res) => {
+      const resault = await usersCullectionDB.find().toArray();
+      res.send(resault);
+    });
     app.post("/users", async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
