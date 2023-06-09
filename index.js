@@ -33,7 +33,28 @@ async function run() {
     const classesCullectionDB = database.collection("classes");
     // routes
     app.get("/classes", async (req, res) => {
+      const query = { status: "approved" };
+      const resault = await classesCullectionDB.find(query).toArray();
+      res.send(resault);
+    });
+    app.get("/classes/all", async (req, res) => {
       const resault = await classesCullectionDB.find().toArray();
+      res.send(resault);
+    });
+    app.patch("/classes/status/:id", async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      console.log(data, 123);
+      const update = {
+        $set: data,
+      };
+      const query = { _id: new ObjectId(id) };
+      // const resault = await classesCullectionDB.updateOne(query, update);
+      res.send(resault);
+    });
+    app.post("/classes", async (req, res) => {
+      const data = req.body;
+      const resault = await classesCullectionDB.insertOne(data);
       res.send(resault);
     });
     app.get("/role/", async (req, res) => {
