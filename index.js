@@ -31,7 +31,19 @@ async function run() {
     const database = client.db("assignment12");
     const usersCullectionDB = database.collection("users");
     const classesCullectionDB = database.collection("classes");
+    const cartsCullectionDB = database.collection("carts");
     // routes
+    app.get("/cart/:uId/:status", async (req, res) => {
+      const uid = req.params.uId;
+      const status = req.params.status === ":false" ? false : true;
+      const query = {
+        selectedBy: uid,
+        isPayed: status,
+      };
+      // console.log(uid, status);
+      const resault = await cartsCullectionDB.find(query).toArray();
+      res.send(resault);
+    });
     app.get("/classes", async (req, res) => {
       const query = { status: "approv" };
       const resault = await classesCullectionDB.find(query).toArray();
@@ -77,6 +89,12 @@ async function run() {
     });
     app.get("/users", async (req, res) => {
       const resault = await usersCullectionDB.find().toArray();
+      res.send(resault);
+    });
+    app.get("/user", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const resault = await usersCullectionDB.findOne(query);
       res.send(resault);
     });
     app.post("/users", async (req, res) => {
