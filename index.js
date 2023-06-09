@@ -44,12 +44,12 @@ async function run() {
     app.patch("/classes/status/:id", async (req, res) => {
       const id = req.params.id;
       const data = req.body;
-      console.log(data, 123);
+      // console.log(data, 123);
       const update = {
         $set: data,
       };
       const query = { _id: new ObjectId(id) };
-      // const resault = await classesCullectionDB.updateOne(query, update);
+      const resault = await classesCullectionDB.updateOne(query, update);
       res.send(resault);
     });
     app.post("/classes", async (req, res) => {
