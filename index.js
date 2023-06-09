@@ -33,7 +33,7 @@ async function run() {
     const classesCullectionDB = database.collection("classes");
     // routes
     app.get("/classes", async (req, res) => {
-      const query = { status: "approved" };
+      const query = { status: "approv" };
       const resault = await classesCullectionDB.find(query).toArray();
       res.send(resault);
     });
