@@ -50,6 +50,12 @@ async function run() {
       const resault = await classesCullectionDB.find(query).toArray();
       res.send(resault);
     });
+    app.get("/instructorclass", async (req, res) => {
+      const email = req.query.email;
+      const query = { instructorEmail: email };
+      const resault = await classesCullectionDB.find(query).toArray();
+      res.send(resault);
+    });
     app.get("/classes/all", async (req, res) => {
       const resault = await classesCullectionDB.find().toArray();
       res.send(resault);
@@ -73,7 +79,7 @@ async function run() {
     app.get("/role/", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
-      const projection = { projection: { rol: 1 } };
+      const projection = { projection: { rol: 1, email: 1 } };
       const resault = await usersCullectionDB.findOne(query, projection);
       // console.log(resault, email);
       res.send(resault);
