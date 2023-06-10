@@ -45,6 +45,27 @@ async function run() {
       const resault = await cartsCullectionDB.find(query).toArray();
       res.send(resault);
     });
+    app.post("/carts/:id/:uid", async (req, res) => {
+      const id = req.params.id;
+      const uid = req.params.uid;
+      const data = req.body;
+      const alradyin = await cartsCullectionDB.findOne({
+        classId: id,
+        selectedBy: uid,
+      });
+      const price = await classesCullectionDB.findOne(
+        { _id: new ObjectId(id) },
+        { projection: { price: 1 } }
+      );
+      const finalData = { ...data, price: price.price };
+      // console.log(price.price);
+      if (alradyin) {
+        // console.log(id, uid);
+        return res.send({ massege: "alrady seclected" });
+      }
+      const resault = await cartsCullectionDB.insertOne(finalData);
+      res.send(resault);
+    });
     app.get("/classes", async (req, res) => {
       const query = { status: "approv" };
       const resault = await classesCullectionDB.find(query).toArray();
@@ -82,6 +103,11 @@ async function run() {
       const projection = { projection: { rol: 1, email: 1 } };
       const resault = await usersCullectionDB.findOne(query, projection);
       // console.log(resault, email);
+      res.send(resault);
+    });
+    app.get("/getinstructor", async (req, res) => {
+      const query = { rol: "instructor" };
+      const resault = await usersCullectionDB.find(query).toArray();
       res.send(resault);
     });
     app.patch("/makeinstructor/:id", async (req, res) => {
@@ -136,6 +162,17 @@ async function run() {
         currency: "usd",
         payment_method_types: ["card"],
       });
+      const theClass = await classesCullectionDB.findOne(
+        { _id: new ObjectId(id) },
+        { projection: { availableSeats: 1 } }
+      );
+      const decriseSeats = await parseFloat(
+        Number(theClass.availableSeats) - 1
+      );
+      const update = await classesCullectionDB.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { availableSeats: decriseSeats.toString() } }
+      );
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
