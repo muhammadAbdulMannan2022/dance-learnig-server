@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
+const stripe = require("stripe")(process.env.Stripe_k);
 const port = process.env.PORT || 5000;
 // middelwer
 app.use(cors());
@@ -106,6 +107,45 @@ async function run() {
       }
       const resault = await usersCullectionDB.insertOne(user);
       res.send(resault);
+    });
+    // payment
+    app.post("/create-payment-intent", async (req, res) => {
+      const body = req.body;
+      // const price = body.price * 100;
+      const id = body.classToPayId;
+      const email = body.userEmail;
+      const user = await usersCullectionDB.findOne({ email: email });
+      const cart = await cartsCullectionDB.findOne({
+        classId: id,
+        selectedBy: user._id.toString(),
+      });
+      let price = 0;
+      if (cart) {
+        price = Number(parseFloat(cart.price)).toFixed(2) * 100;
+      } else {
+        return res.send({ massege: "class not found in your entered id" });
+      }
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: price,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
+    app.patch("/updatepay", async (req, res) => {
+      const id = req.body.classToPayId;
+      const email = req.body.userEmail;
+      const user = await usersCullectionDB.findOne({ email: email });
+      const updateStatus = await cartsCullectionDB.updateOne(
+        {
+          classId: id,
+          selectedBy: user._id.toString(),
+        },
+        { $set: { isPayed: true } }
+      );
+      res.send(updateStatus);
     });
   } finally {
     // Ensures that the client will close when you finish/error
