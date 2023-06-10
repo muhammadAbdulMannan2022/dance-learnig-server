@@ -164,14 +164,19 @@ async function run() {
       });
       const theClass = await classesCullectionDB.findOne(
         { _id: new ObjectId(id) },
-        { projection: { availableSeats: 1 } }
+        { projection: { availableSeats: 1, enrolledStudents: 1 } }
       );
       const decriseSeats = await parseFloat(
         Number(theClass.availableSeats) - 1
       );
       const update = await classesCullectionDB.updateOne(
         { _id: new ObjectId(id) },
-        { $set: { availableSeats: decriseSeats.toString() } }
+        {
+          $set: {
+            availableSeats: decriseSeats.toString(),
+            enrolledStudents: Number(theClass.enrolledStudents) + 1,
+          },
+        }
       );
       res.send({
         clientSecret: paymentIntent.client_secret,
