@@ -25,10 +25,6 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
     const database = client.db("assignment12");
     const usersCullectionDB = database.collection("users");
     const classesCullectionDB = database.collection("classes");
@@ -195,6 +191,10 @@ async function run() {
       );
       res.send(updateStatus);
     });
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
